@@ -43,6 +43,7 @@
     "commander": "^2.15.0",
     "core-js": "^3.5.0",
     "hapi": "^18.1.0",
+    "hapi-rate-limit": "^6.0.0",
     "inert": "^5.1.0",
     "jquery": "^3.6.0",
     "jsonwebtoken": "^8.5.1",
