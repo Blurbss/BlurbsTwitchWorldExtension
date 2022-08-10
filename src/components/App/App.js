@@ -34,6 +34,7 @@ export default class App extends React.Component{
       return {
         type: type,
         //url: location.protocol + '//localhost:8081/color/' + method,
+        //url: 'https://blurbsttv.com/' + method,
         url: 'https://localhost:8081/' + method,
         crossDomain: true,
         data: data != null ? {"vote":`${data}`} : null,
@@ -151,10 +152,13 @@ export default class App extends React.Component{
         console.log("CELL CLICKED: " + cell);
         let roundRequest = this.requests.round;
         let voteRequest = this.requests.vote;
-        voteRequest.data = {"vote":`${cell}`};
         let currentRound = 0; 
         $.ajax(roundRequest).then(x => {
           currentRound = x;
+          voteRequest.data = {
+            "vote":`${cell}`,
+            "round": currentRound
+          };
           console.log("CURRENTROUND: " + currentRound.toString() + " LASTROUND: " + this.state.lastRound);
           if (currentRound != this.state.lastRound) {
             this.setState({lastRound: currentRound});

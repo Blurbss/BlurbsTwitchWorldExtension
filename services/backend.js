@@ -56,7 +56,7 @@ ext.
     })
   })
   wss.on('listening',()=>{
-    console.log('listening on 8080')
+    console.log('listening on 8008')
   })
 
 const key = "Q2jjgE2Vg2l9+wj6GjHYxbM794h56EpScW4cstkJShw=";//Buffer.from(getOption('secret', 'ENV_SECRET'), 'base64');
@@ -208,6 +208,9 @@ function verifyAndDecode (header) {
 function setVoteHandler (req) {
   //verifyAndDecode(req.headers.authorization); //AUTH
   let vote = req.payload.vote;
+  let roundVoted = req.payload.round;
+  if (roundVoted < round)
+    return "Late vote discarded";
   console.log("VOTE: " + vote);
   let count = votes[vote];
   votes[vote] = Number.isInteger(count) ? count + 1 : 1;
