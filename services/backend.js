@@ -72,8 +72,7 @@ const serverOptions = {
         'https://*.ext-twitch.tv',
         'https://api.twitch.tv',
         'wss://pubsub-edge.twitch.tv'
-      ],
-      additionalHeaders: ['cache-control', 'x-requested-with', "Access-Control-Allow-Origin: https://blurbsttv.com"]
+      ]
     }
   }
 };
@@ -107,7 +106,7 @@ const server = new Hapi.Server(serverOptions);
               'https://*.ext-twitch.tv',
               'https://api.twitch.tv',
               'wss://pubsub-edge.twitch.tv'],
-            additionalHeaders: ['cache-control', 'x-requested-with', "Access-Control-Allow-Origin: https://blurbsttv.com"]
+            additionalHeaders: ['cache-control', 'x-requested-with']
         }
     },
     method: 'POST',
