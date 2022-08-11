@@ -34,8 +34,8 @@ export default class App extends React.Component{
       return {
         type: type,
         //url: location.protocol + '//localhost:8081/color/' + method,
-        //url: 'https://blurbsttv.com/' + method,
-        url: 'https://localhost:8081/' + method,
+        url: 'https://blurbsttv.com/' + method,
+        //url: 'https://localhost:8081/' + method,
         crossDomain: true,
         data: data != null ? {"vote":`${data}`} : null,
         //dataType: 'json',

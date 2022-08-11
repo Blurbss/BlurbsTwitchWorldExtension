@@ -67,7 +67,7 @@ const serverOptions = {
   port: 8081,
   routes: {
     cors: {
-      origin: ['*']
+      origin: ['https://28lg0adwdxpa06vtsq2kekkml5ahvs.ext-twitch.tv']
     }
   }
 };
