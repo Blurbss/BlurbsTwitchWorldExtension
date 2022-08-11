@@ -67,7 +67,13 @@ const serverOptions = {
   port: 8081,
   routes: {
     cors: {
-      origin: ['https://28lg0adwdxpa06vtsq2kekkml5ahvs.ext-twitch.tv']
+      origin: [
+        '*',
+        'https://28lg0adwdxpa06vtsq2kekkml5ahvs.ext-twitch.tv',
+        'https://*.ext-twitch.tv',
+        'https://api.twitch.tv',
+        'wss://pubsub-edge.twitch.tv'
+      ]
     }
   }
 };
