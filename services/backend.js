@@ -68,7 +68,6 @@ const serverOptions = {
   routes: {
     cors: {
       origin: [
-        '*',
         'https://28lg0adwdxpa06vtsq2kekkml5ahvs.ext-twitch.tv',
         'https://*.ext-twitch.tv',
         'https://api.twitch.tv',
