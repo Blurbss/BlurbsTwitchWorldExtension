@@ -24,6 +24,7 @@ const bearerPrefix = 'Bearer ';             // HTTP authorization headers have t
 var votes = {};
 var ballots = 0;
 var round = 0;
+var locked = false;
 
 const STRINGS = {
   secretEnv: usingValue('secret'),
@@ -49,10 +50,11 @@ ext.
     ws = wsocket;
     ws.on('message', (data) => {
        console.log('data received \n %o',data)
+       let lock = data.includes("LOCK") > -1;
        if (data == "ChoicePls")
         tallyVotes(true);
-      if (data == "StatusPls")
-        tallyVotes(false);
+       if (data == "StatusPls")
+        tallyVotes(false, lock);
     })
   })
   wss.on('listening',()=>{
@@ -131,7 +133,9 @@ const server = new Hapi.Server(serverOptions);
 
 //setInterval(tallyVotes, 5000);
 
-function tallyVotes(reset = false) {
+function tallyVotes(reset = false, lock = false) {
+  locked = lock;
+  
   let choice = "";
   let max = 0;
   let keys = Object.keys(votes);
@@ -150,7 +154,8 @@ function tallyVotes(reset = false) {
   let data = {
     choice: choice,
     percentage: percentage,
-    final: reset
+    final: reset,
+    locked: lock
   };
 
   console.log("CHOICE: " + choice);
@@ -215,6 +220,8 @@ function verifyAndDecode (header) {
 }
 
 function setVoteHandler (req) {
+  if (locked)
+    return "Voting locked for end of this round";
   //verifyAndDecode(req.headers.authorization); //AUTH
   let vote = req.payload.vote;
   let roundVoted = req.payload.round;
