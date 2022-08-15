@@ -75,7 +75,8 @@ const serverOptions = {
         'https://*.ext-twitch.tv',
         'https://api.twitch.tv',
         'wss://pubsub-edge.twitch.tv',
-        'https://streamelements.com'
+        'https://streamelements.com',
+        'null'
       ]
     }
   }
