@@ -1,3 +1,4 @@
+var https = require('https');
 const fs = require('fs');
 const Hapi = require('@hapi/hapi');
 const path = require('path');
@@ -73,7 +74,8 @@ const serverOptions = {
         'https://28lg0adwdxpa06vtsq2kekkml5ahvs.ext-twitch.tv',
         'https://*.ext-twitch.tv',
         'https://api.twitch.tv',
-        'wss://pubsub-edge.twitch.tv'
+        'wss://pubsub-edge.twitch.tv',
+        'https://streamelements.com'
       ]
     }
   }
@@ -101,13 +103,19 @@ const server = new Hapi.Server(serverOptions);
     handler: getRoundHandler
   });
   server.route({
+    method: 'GET',
+    path: '/chatters/{user}',
+    handler: getChattersHandler
+  });
+  server.route({
     config: {
         cors: {
             origin: [
               'https://28lg0adwdxpa06vtsq2kekkml5ahvs.ext-twitch.tv',
               'https://*.ext-twitch.tv',
               'https://api.twitch.tv',
-              'wss://pubsub-edge.twitch.tv'],
+              'wss://pubsub-edge.twitch.tv',
+              'https://streamelements.com'],
             additionalHeaders: ['cache-control', 'x-requested-with']
         }
     },
@@ -242,4 +250,25 @@ function helloWorldHandler (req) {
 
 function getRoundHandler (req) {
   return round;
+}
+
+function getChattersHandler(req) {
+  var settings = {
+      host: 'tmi.twitch.tv',
+      path: '/group/user/' + req.params.user + '/chatters'
+  };
+  return new Promise((resolve) => {
+    const request = https.request(settings, res => {
+      let str = '';
+      res.on('data', d => {
+        str += d;
+      });
+
+      res.on('end', function() {
+        resolve(JSON.parse(str).chatters.viewers);
+      });
+    });
+
+    request.end();
+  });
 }
