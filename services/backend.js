@@ -27,6 +27,10 @@ var ballots = 0;
 var round = 0;
 var locked = false;
 
+//STUFF FOR AFK WIDGET
+var flotsamPull = false;
+var blurbsPull = false;
+
 const STRINGS = {
   secretEnv: usingValue('secret'),
   clientIdEnv: usingValue('client-id'),
@@ -107,6 +111,16 @@ const server = new Hapi.Server(serverOptions);
     method: 'GET',
     path: '/chatters/{user}',
     handler: getChattersHandler
+  });
+  server.route({
+    method: 'GET',
+    path: '/time/{user}',
+    handler: getTimeHandler
+  });
+  server.route({
+    method: 'GET',
+    path: '/pull/{user}',
+    handler: getPullHandler
   });
   server.route({
     config: {
@@ -273,3 +287,37 @@ function getChattersHandler(req) {
     request.end();
   });
 }
+
+function getPullHandler(req) {
+  let user = req.params.user.toLowerCase();
+  if (user == "blurbs")
+    blurbsPull = true;
+  if (user == "flotsam")
+    flotsamPull = true;
+
+  return "Next update will pull name";
+}
+
+function getTimeHandler(req) {
+  let user = req.params.user.toLowerCase();
+  if (user == "blurbs")
+  {
+    let pull = blurbsPull;
+    blurbsPull = false;
+    console.log(pull);
+
+    return pull;
+  }
+  if (user == "flotsam")
+  {
+    let pull = flotsamPull;
+    flotsamPull = false;
+    console.log(pull);
+
+    return pull;
+  }
+
+  return false;
+}
+
+
