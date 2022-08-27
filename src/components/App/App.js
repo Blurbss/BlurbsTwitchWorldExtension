@@ -90,9 +90,10 @@ export default class App extends React.Component{
                     })
                 }
             })
-
+            console.log("PUB SUB LISTEN");
             this.twitch.listen('broadcast',(target,contentType,body)=>{
-                this.twitch.rig.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
+                console.log("PUB SUB TEST");
+                console.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
                 // now that you've got a listener, do something with the result... 
 
                 // do something...

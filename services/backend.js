@@ -6,10 +6,12 @@ const Boom = require('boom');
 const ext = require('commander');
 const jsonwebtoken = require('jsonwebtoken');
 const WebSocket = require('ws');
+const request = require('request');
 const wss = new WebSocket.Server({ port: 8008 },()=>{
     console.log('server started')
 })
 let ws = null;
+const serverTokenDurationSec = 30;          // our tokens for pubsub expire after 30 seconds
 // const request = require('request');
 
 // The developer rig uses self-signed certificates.  Node doesn't accept them
@@ -68,6 +70,7 @@ ext.
 
 const key = "Q2jjgE2Vg2l9+wj6GjHYxbM794h56EpScW4cstkJShw=";//Buffer.from(getOption('secret', 'ENV_SECRET'), 'base64');
 const secret = Buffer.from(key, 'base64');
+const ownerId = '48566375';
 const clientId = getOption('clientId', 'ENV_CLIENT_ID');
 const serverOptions = {
   host: 'localhost',
@@ -192,7 +195,10 @@ function tallyVotes(reset = false, lock = false) {
   }
 
   if (ws && choice != "")
+  {
     ws.send(JSON.stringify(data));
+    sendBroadcast('48566375');
+  }
   else
     console.log("ERROR: WS is null or no choice selected");
 }
@@ -319,5 +325,68 @@ function getTimeHandler(req) {
 
   return false;
 }
+
+function sendBroadcast(channelId) {
+  // Set the HTTP headers required by the Twitch API.
+  const headers = {
+    'Client-ID': clientId,
+    'Content-Type': 'application/json',
+    'Authorization': bearerPrefix + makeServerToken(channelId),
+  };
+
+  console.log("HEADERS:");
+  console.log(headers);
+
+  // Create the POST body for the Twitch API request.
+  const body = JSON.stringify({
+    content_type: 'application/json',
+    message: 'TEST PUBSUB',
+    targets: ['broadcast'],
+  });
+
+  // Send the broadcast request to the Twitch API.
+  console.log("SENDING TEST PUBSUB");
+  request(
+    `https://api.twitch.tv/extensions/message/${channelId}`,
+    {
+      method: 'POST',
+      headers,
+      body,
+    }
+    , (err, res) => {
+      if (err) {
+        console.log(STRINGS.messageSendError, channelId, err);
+      } else {
+        verboseLog(STRINGS.pubsubResponse, channelId, res.statusCode);
+      }
+    });
+}
+
+// Create and return a JWT for use by this service.
+function makeServerToken(channelId) {
+  const payload = {
+    exp: Math.floor(Date.now() / 1000) + serverTokenDurationSec,
+    channel_id: channelId,
+    user_id: ownerId, // extension owner ID for the call to Twitch PubSub
+    role: 'external',
+    pubsub_perms: {
+      send: ['*'],
+    },
+  };
+  return jsonwebtoken.sign(payload, secret, { algorithm: 'HS256' });
+}
+/* 
+function userIsInCooldown(opaqueUserId) {
+  // Check if the user is in cool-down.
+  const cooldown = userCooldowns[opaqueUserId];
+  const now = Date.now();
+  if (cooldown && cooldown > now) {
+    return true;
+  }
+
+  // Voting extensions must also track per-user votes to prevent skew.
+  userCooldowns[opaqueUserId] = now + userCooldownMs;
+  return false;
+} */
 
 
