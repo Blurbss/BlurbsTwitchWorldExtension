@@ -84,6 +84,7 @@ const serverOptions = {
         'wss://pubsub-edge.twitch.tv',
         'https://streamelements.com',
         'null'
+        //'*'
       ]
     }
   }
@@ -133,7 +134,10 @@ const server = new Hapi.Server(serverOptions);
               'https://*.ext-twitch.tv',
               'https://api.twitch.tv',
               'wss://pubsub-edge.twitch.tv',
-              'https://streamelements.com'],
+              'https://streamelements.com',
+              'null'
+              //'*'
+            ],
             additionalHeaders: ['cache-control', 'x-requested-with']
         }
     },
@@ -192,13 +196,11 @@ function tallyVotes(reset = false, lock = false) {
     console.log("RESETTING VOTES");
     votes = {};
     ballots = 0;
+    sendBroadcast('48566375');
   }
 
   if (ws && choice != "")
-  {
     ws.send(JSON.stringify(data));
-    sendBroadcast('48566375');
-  }
   else
     console.log("ERROR: WS is null or no choice selected");
 }
@@ -340,12 +342,12 @@ function sendBroadcast(channelId) {
   // Create the POST body for the Twitch API request.
   const body = JSON.stringify({
     content_type: 'application/json',
-    message: 'TEST PUBSUB',
+    message: `newRound${round}`,
     targets: ['broadcast'],
   });
 
   // Send the broadcast request to the Twitch API.
-  console.log("SENDING TEST PUBSUB");
+  console.log("SENDING PUBSUB");
   request(
     `https://api.twitch.tv/extensions/message/${channelId}`,
     {

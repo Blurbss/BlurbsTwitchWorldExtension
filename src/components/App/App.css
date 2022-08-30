@@ -51,6 +51,17 @@
     height: 100%;
 }
 
+.marker {
+    position:fixed;
+    width: 20px;
+    height: 20px;
+    border-radius: 25px;
+    background: #28a745;
+    display: block;
+    transform: translate(-50%,-50%);
+    z-index:99999;
+}
+
 div.clickEffect {
     position:fixed;
     box-sizing:border-box;

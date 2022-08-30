@@ -17,11 +17,12 @@ export default class App extends React.Component{
             finishedLoading:false,
             theme:'light',
             isVisible:true,
+            currentRound: 0,
             lastRound: 0,
             cooldown: false
         }
         
-        document.addEventListener('click',this.clickEffect);
+        //document.addEventListener('click',this.clickEffect);
     }
 
     // create the request options for our Twitch API calls
@@ -92,12 +93,13 @@ export default class App extends React.Component{
             })
             console.log("PUB SUB LISTEN");
             this.twitch.listen('broadcast',(target,contentType,body)=>{
-                console.log("PUB SUB TEST");
-                console.log(`New PubSub message!\n${target}\n${contentType}\n${body}`)
+                console.log(`New PubSub message!\n${target}\n${contentType}\n${body}`);
                 // now that you've got a listener, do something with the result... 
-
                 // do something...
-
+                if (body.indexOf("newRound") > -1) {
+                  this.setState({currentRound: parseInt(body.replace('newRound', ''))});
+                  $(".marker").remove();
+                }
             })
 
             this.twitch.onVisibilityChanged((isVisible,_c)=>{
@@ -151,10 +153,22 @@ export default class App extends React.Component{
         setTimeout(() => {this.setState({cooldown: false});}, 500);
         this.setAuth();
         console.log("CELL CLICKED: " + cell);
-        let roundRequest = this.requests.round;
+        //let roundRequest = this.requests.round;
         let voteRequest = this.requests.vote;
-        let currentRound = 0; 
-        $.ajax(roundRequest).then(x => {
+
+        console.log("CURRENTROUND: " + this.state.currentRound.toString() + " LASTROUND: " + this.state.lastRound);
+        if (this.state.currentRound != this.state.lastRound) {
+          voteRequest.data = {
+            "vote":`${cell}`,
+            "round": this.state.currentRound
+          };
+          this.setState({lastRound: currentRound});
+          $.ajax(voteRequest);
+        }
+        else
+          console.log("VOTE FAILED");
+        
+        /*$.ajax(roundRequest).then(x => {
           currentRound = x;
           voteRequest.data = {
             "vote":`${cell}`,
@@ -167,17 +181,25 @@ export default class App extends React.Component{
           }
           else
           console.log("FAIL");
-        });
+        });*/
     }
 
     clickEffect = (e) => {
-      if (this.state.cooldown)
+      if (this.state.cooldown || this.state.currentRound == this.state.lastRound)
         return;
-      var d=document.createElement("div");
-      d.className="clickEffect";
-      d.style.top=e.clientY+"px";d.style.left=e.clientX+"px";
+      var d = document.createElement("div");
+      d.className = "clickEffect";
+      d.style.top = e.clientY+"px";
+      d.style.left = e.clientX+"px";
       document.body.appendChild(d);
       d.addEventListener('animationend',function(){d.parentElement.removeChild(d);}.bind(this));
+
+      $(".marker").remove();
+      var marker = document.createElement("div");
+      marker.className = "marker";
+      marker.style.top = e.clientY+"px";
+      marker.style.left = e.clientX+"px";
+      document.body.appendChild(marker);
     }
     
     render(){
@@ -186,7 +208,7 @@ export default class App extends React.Component{
                 <div className="App">
                   <div className="full-size">
                     <div className="aspect-ratio-box-inside">
-                      <div className="flexbox-centering">
+                      <div className="flexbox-centering" onClick={this.clickEffect}>
                         <div className="viewport-sizing">
                           <button id="A1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A1") }}>A1</button>
                           <button id="A2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A2") }}>A2</button>
@@ -228,7 +250,7 @@ export default class App extends React.Component{
                   <p>Click Item <input value='Vote' type='button' onClick={this.onClickItemHandler}/></p>
                   <div className="aspect-ratio-box">
                     <div className="aspect-ratio-box-inside">
-                      <div className="flexbox-centering">
+                      <div className="flexbox-centering" onClick={this.clickEffect}>
                         <div className="viewport-sizing">
                           <button id="A1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A1") }}>A1</button>
                           <button id="A2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A2") }}>A2</button>
