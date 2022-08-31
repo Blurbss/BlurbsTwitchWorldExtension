@@ -162,7 +162,7 @@ export default class App extends React.Component{
             "vote":`${cell}`,
             "round": this.state.currentRound
           };
-          this.setState({lastRound: currentRound});
+          this.setState({lastRound: this.state.currentRound});
           $.ajax(voteRequest);
         }
         else

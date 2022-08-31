@@ -57,7 +57,7 @@ ext.
     ws = wsocket;
     ws.on('message', (data) => {
        console.log('data received \n %o',data)
-       let lock = data.includes("LOCK") > -1;
+       let lock = data.includes("LOCK");
        if (data == "ChoicePls")
         tallyVotes(true);
        if (data == "StatusPls")
@@ -335,9 +335,6 @@ function sendBroadcast(channelId) {
     'Content-Type': 'application/json',
     'Authorization': bearerPrefix + makeServerToken(channelId),
   };
-
-  console.log("HEADERS:");
-  console.log(headers);
 
   // Create the POST body for the Twitch API request.
   const body = JSON.stringify({
