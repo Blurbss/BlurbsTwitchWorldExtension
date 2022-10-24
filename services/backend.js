@@ -353,7 +353,7 @@ function sendBroadcast(channelId, choices) {
   // Create the POST body for the Twitch API request.
   const body = JSON.stringify({
     content_type: 'application/json',
-    message: `newRound${round}`,
+    message: message,
     targets: ['broadcast'],
   });
 
