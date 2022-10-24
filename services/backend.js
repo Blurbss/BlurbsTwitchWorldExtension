@@ -348,7 +348,7 @@ function sendBroadcast(channelId, choices) {
   if (choices == null)
     message = `newRound${round}`;
   else
-    message = `statusUpdate${choices.map(x => `${x.Key + x.Value.toString()}%`).join().replaceAll(',','')}`;
+    message = `statusUpdate${choices.map(x => `${x.Key + x.Value.toString()}%`).join("")}`;
 
   // Create the POST body for the Twitch API request.
   const body = JSON.stringify({

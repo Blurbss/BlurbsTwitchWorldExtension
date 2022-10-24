@@ -68,8 +68,9 @@
 }
 
 .percent {
-    opacity: 0.5;
+    opacity: 1;
     font-size: 3vw;
+    color: white;
     position: absolute;
     transform: translate(-60%, -50%);
 }
