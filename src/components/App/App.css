@@ -26,9 +26,9 @@
     left:0;
     right:0;  
     height: auto;
-    padding-top: 5rem;
-    padding-right: 7rem;
-    padding-bottom: 5rem;
+    padding-top: 5vw;
+    padding-right: 7vw;
+    padding-bottom: 5vw;
     background-size:100% 100%;
 }
 .flexbox-centering {
@@ -60,6 +60,18 @@
     display: block;
     transform: translate(-50%,-50%);
     z-index:99999;
+}
+
+.gridBtn {
+    background-color: rgba(255, 255, 255, 0);
+    border-color: rgba(0,0,0,0);
+}
+
+.percent {
+    opacity: 0.5;
+    font-size: 3vw;
+    position: absolute;
+    transform: translate(-60%, -50%);
 }
 
 div.clickEffect {

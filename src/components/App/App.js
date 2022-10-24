@@ -30,11 +30,11 @@ export default class App extends React.Component{
       round: this.createRequest('GET', 'round'),
       vote: this.createRequest('POST', 'vote', ""),
     };
+    bufferTime = 3;
 
     createRequest (type, method, data) {
       return {
         type: type,
-        //url: location.protocol + '//localhost:8081/color/' + method,
         url: 'https://blurbsttv.com/' + method,
         //url: 'https://localhost:8081/' + method,
         crossDomain: true,
@@ -76,6 +76,11 @@ export default class App extends React.Component{
         })
     }
 
+    newRound(roundNum) {
+      $(".marker").remove();
+      this.setState({currentRound: roundNum});
+    }
+
     componentDidMount(){
         if(this.twitch){
             this.twitch.onAuthorized((auth)=>{
@@ -97,8 +102,19 @@ export default class App extends React.Component{
                 // now that you've got a listener, do something with the result... 
                 // do something...
                 if (body.indexOf("newRound") > -1) {
-                  this.setState({currentRound: parseInt(body.replace('newRound', ''))});
-                  $(".marker").remove();
+                  setTimeout(() => {this.newRound(parseInt(body.replace('newRound', '')));}, this.bufferTime * 1000);
+                }
+                if (body.indexOf("statusUpdate") > -1) {
+                  $('.percent').text('');
+                  let percentages = body.replace('statusUpdate', '').split('%').filter(x => x).map(x => {
+                    let num = parseFloat(x.slice(2, x.length - 2));
+                    return {cell: x.slice(0,2), percent: num};
+                  });
+                  percentages.sort((a, b) => {return b.percent - a.percent});
+                  for(let i = 0;i < percentages.length; i++) {
+                    let el = percentages[i];
+                    $(`#${el.cell}`).children().first().text((i+1).toString());
+                  }
                 }
             })
 
@@ -210,30 +226,30 @@ export default class App extends React.Component{
                     <div className="aspect-ratio-box-inside">
                       <div className="flexbox-centering" onClick={this.clickEffect}>
                         <div className="viewport-sizing">
-                          <button id="A1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A1") }}>A1</button>
-                          <button id="A2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A2") }}>A2</button>
-                          <button id="A3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A3") }}>A3</button>
-                          <button id="A4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A4") }}>A4</button>
-                          <button id="A5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A5") }}>A5</button>
-                          <button id="A6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A6") }}>A6</button>
-                          <button id="B1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B1") }}>B1</button>
-                          <button id="B2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B2") }}>B2</button>
-                          <button id="B3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B3") }}>B3</button>
-                          <button id="B4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B4") }}>B4</button>
-                          <button id="B5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B5") }}>B5</button>
-                          <button id="B6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B6") }}>B6</button>
-                          <button id="C1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C1") }}>C1</button>
-                          <button id="C2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C2") }}>C2</button>
-                          <button id="C3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C3") }}>C3</button>
-                          <button id="C4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C4") }}>C4</button>
-                          <button id="C5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C5") }}>C5</button>
-                          <button id="C6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C6") }}>C6</button>
-                          <button id="D1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D1") }}>D1</button>
-                          <button id="D2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D2") }}>D2</button>
-                          <button id="D3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D3") }}>D3</button>
-                          <button id="D4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D4") }}>D4</button>
-                          <button id="D5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D5") }}>D5</button>
-                          <button id="D6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D6") }}>D6</button>
+                          <button id="A1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A1") }}><span className="percent"></span></button>
+                          <button id="A2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A2") }}><span className="percent"></span></button>
+                          <button id="A3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A3") }}><span className="percent"></span></button>
+                          <button id="A4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A4") }}><span className="percent"></span></button>
+                          <button id="A5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A5") }}><span className="percent"></span></button>
+                          <button id="A6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A6") }}><span className="percent"></span></button>
+                          <button id="B1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B1") }}><span className="percent"></span></button>
+                          <button id="B2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B2") }}><span className="percent"></span></button>
+                          <button id="B3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B3") }}><span className="percent"></span></button>
+                          <button id="B4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B4") }}><span className="percent"></span></button>
+                          <button id="B5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B5") }}><span className="percent"></span></button>
+                          <button id="B6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B6") }}><span className="percent"></span></button>
+                          <button id="C1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C1") }}><span className="percent"></span></button>
+                          <button id="C2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C2") }}><span className="percent"></span></button>
+                          <button id="C3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C3") }}><span className="percent"></span></button>
+                          <button id="C4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C4") }}><span className="percent"></span></button>
+                          <button id="C5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C5") }}><span className="percent"></span></button>
+                          <button id="C6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C6") }}><span className="percent"></span></button>
+                          <button id="D1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D1") }}><span className="percent"></span></button>
+                          <button id="D2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D2") }}><span className="percent"></span></button>
+                          <button id="D3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D3") }}><span className="percent"></span></button>
+                          <button id="D4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D4") }}><span className="percent"></span></button>
+                          <button id="D5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D5") }}><span className="percent"></span></button>
+                          <button id="D6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D6") }}><span className="percent"></span></button>
                         </div>
                       </div>
                     </div>
@@ -252,30 +268,30 @@ export default class App extends React.Component{
                     <div className="aspect-ratio-box-inside">
                       <div className="flexbox-centering" onClick={this.clickEffect}>
                         <div className="viewport-sizing">
-                          <button id="A1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A1") }}>A1</button>
-                          <button id="A2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A2") }}>A2</button>
-                          <button id="A3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A3") }}>A3</button>
-                          <button id="A4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A4") }}>A4</button>
-                          <button id="A5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A5") }}>A5</button>
-                          <button id="A6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A6") }}>A6</button>
-                          <button id="B1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B1") }}>B1</button>
-                          <button id="B2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B2") }}>B2</button>
-                          <button id="B3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B3") }}>B3</button>
-                          <button id="B4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B4") }}>B4</button>
-                          <button id="B5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B5") }}>B5</button>
-                          <button id="B6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B6") }}>B6</button>
-                          <button id="C1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C1") }}>C1</button>
-                          <button id="C2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C2") }}>C2</button>
-                          <button id="C3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C3") }}>C3</button>
-                          <button id="C4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C4") }}>C4</button>
-                          <button id="C5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C5") }}>C5</button>
-                          <button id="C6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C6") }}>C6</button>
-                          <button id="D1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D1") }}>D1</button>
-                          <button id="D2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D2") }}>D2</button>
-                          <button id="D3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D3") }}>D3</button>
-                          <button id="D4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D4") }}>D4</button>
-                          <button id="D5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D5") }}>D5</button>
-                          <button id="D6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D6") }}>D6</button>
+                          <button id="A1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A1") }}><span className="percent"></span></button>
+                          <button id="A2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A2") }}><span className="percent"></span></button>
+                          <button id="A3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A3") }}><span className="percent"></span></button>
+                          <button id="A4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A4") }}><span className="percent"></span></button>
+                          <button id="A5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A5") }}><span className="percent"></span></button>
+                          <button id="A6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("A6") }}><span className="percent"></span></button>
+                          <button id="B1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B1") }}><span className="percent"></span></button>
+                          <button id="B2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B2") }}><span className="percent"></span></button>
+                          <button id="B3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B3") }}><span className="percent"></span></button>
+                          <button id="B4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B4") }}><span className="percent"></span></button>
+                          <button id="B5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B5") }}><span className="percent"></span></button>
+                          <button id="B6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("B6") }}><span className="percent"></span></button>
+                          <button id="C1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C1") }}><span className="percent"></span></button>
+                          <button id="C2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C2") }}><span className="percent"></span></button>
+                          <button id="C3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C3") }}><span className="percent"></span></button>
+                          <button id="C4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C4") }}><span className="percent"></span></button>
+                          <button id="C5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C5") }}><span className="percent"></span></button>
+                          <button id="C6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("C6") }}><span className="percent"></span></button>
+                          <button id="D1" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D1") }}><span className="percent"></span></button>
+                          <button id="D2" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D2") }}><span className="percent"></span></button>
+                          <button id="D3" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D3") }}><span className="percent"></span></button>
+                          <button id="D4" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D4") }}><span className="percent"></span></button>
+                          <button id="D5" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D5") }}><span className="percent"></span></button>
+                          <button id="D6" className="gridBtn" disabled={this.state.cooldown} onClick={() => { this.onGridClick("D6") }}><span className="percent"></span></button>
                         </div>
                       </div>
                     </div>

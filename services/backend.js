@@ -166,29 +166,35 @@ const server = new Hapi.Server(serverOptions);
 function tallyVotes(reset = false, lock = false) {
   locked = lock;
   
-  let choice = "";
+  let votesSorted = [];
   let max = 0;
   let keys = Object.keys(votes);
-  let percentage = 0;
 
   for (let i = 0;i < keys?.length;i++) {
-    let key = keys[i];
-    let value = votes[key];
-    if (value > max) {
-      max = value;
-      choice = key;
-    }
+    let cell = keys[i];
+    votesSorted.push({key: cell, value: votes[cell]});
   }
 
-  percentage = ((max / ballots) * 100).toFixed(2);
+  votesSorted.sort((a, b) => a.value < b.value ? 1 : a.value > b.value ? -1 : 0);
+  let choices = votesSorted.slice(0, 3).map(x => {
+    let percentage = ((x.value / ballots) * 100).toFixed(2);
+    return {Key: x.key, Value: percentage};
+  });
+
+  if (choices[0] == null)
+    choices[0] = {Key: "test1", Value: 0};
+  if (choices[1] == null)
+    choices[1] = {Key: "test2", Value: 0};
+  if (choices[2] == null)
+    choices[2] = {Key: "test3", Value: 0};
   let data = {
-    choice: choice,
-    percentage: percentage,
+    choices: choices,
+    //percentage: percentage,
     final: reset,
     locked: lock
   };
 
-  console.log("CHOICE: " + choice);
+  console.log("CHOICE: " + choices);
 
   if (reset)
   {
@@ -196,10 +202,12 @@ function tallyVotes(reset = false, lock = false) {
     console.log("RESETTING VOTES");
     votes = {};
     ballots = 0;
-    sendBroadcast('48566375');
+    sendBroadcast('48566375', null);
   }
+  else
+    sendBroadcast('48566375', choices);
 
-  if (ws && choice != "")
+  if (ws && choices[0] != "")
     ws.send(JSON.stringify(data));
   else
     console.log("ERROR: WS is null or no choice selected");
@@ -253,7 +261,7 @@ function verifyAndDecode (header) {
 function setVoteHandler (req) {
   if (locked)
     return "Voting locked for end of this round";
-  //verifyAndDecode(req.headers.authorization); //AUTH
+  verifyAndDecode(req.headers.authorization); //AUTH
   let vote = req.payload.vote;
   let roundVoted = req.payload.round;
   if (roundVoted < round)
@@ -328,13 +336,19 @@ function getTimeHandler(req) {
   return false;
 }
 
-function sendBroadcast(channelId) {
+function sendBroadcast(channelId, choices) {
   // Set the HTTP headers required by the Twitch API.
   const headers = {
     'Client-ID': clientId,
     'Content-Type': 'application/json',
     'Authorization': bearerPrefix + makeServerToken(channelId),
   };
+
+  let message = "";
+  if (choices == null)
+    message = `newRound${round}`;
+  else
+    message = `statusUpdate${choices.map(x => `${x.Key + x.Value.toString()}%`).join()}`;
 
   // Create the POST body for the Twitch API request.
   const body = JSON.stringify({
