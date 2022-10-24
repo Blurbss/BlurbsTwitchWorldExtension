@@ -146,7 +146,7 @@ const server = new Hapi.Server(serverOptions);
     handler: setVoteHandler
   });
   // Start the server.
-/*await server.register({
+await server.register({
   plugin: require('hapi-rate-limit'),
   options: {
     enabled: true,
@@ -156,7 +156,7 @@ const server = new Hapi.Server(serverOptions);
       expiresIn: 5000
     }
   }
-});*/
+});
   await server.start();
   console.log(STRINGS.serverStarted, server.info.uri);
 })();
