@@ -260,7 +260,7 @@ function verifyAndDecode (header) {
 }
 
 function setVoteHandler (req) {
-  console.log(req.auth.credentials)
+  console.log(req.auth)
   if (locked)
     return "Voting locked for end of this round";
   verifyAndDecode(req.headers.authorization); //AUTH
