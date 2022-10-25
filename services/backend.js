@@ -101,6 +101,15 @@ if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.k
 }
 const server = new Hapi.Server(serverOptions);
 (async () => {
+  const validate = async (request, username, password) => {
+    const isValid = true;
+    const credentials = { id: 'test', name: 'test' };
+  
+    return { isValid, credentials };
+  };
+  
+  await server.register(require('@hapi/basic'));
+    server.auth.strategy('simple', 'basic', { validate });
   server.route({
     method: 'GET',
     path: '/test',
@@ -139,7 +148,8 @@ const server = new Hapi.Server(serverOptions);
               //'*'
             ],
             additionalHeaders: ['cache-control', 'x-requested-with']
-        }
+        },
+        auth: { strategies: ['simple'] }
     },
     method: 'POST',
     path: '/vote',
@@ -158,6 +168,7 @@ await server.register({
     userAttribute: 'opaque_user_id'
   }
 });
+
   await server.start();
   console.log(STRINGS.serverStarted, server.info.uri);
 })();
