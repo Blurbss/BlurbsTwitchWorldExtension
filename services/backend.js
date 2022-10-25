@@ -143,11 +143,6 @@ const server = new Hapi.Server(serverOptions);
     },
     method: 'POST',
     path: '/vote',
-    plugins: {
-      'hapi-rate-limit': {
-        userAttribute: 'opaque_user_id'
-      }
-    },
     handler: setVoteHandler
   });
   // Start the server.
