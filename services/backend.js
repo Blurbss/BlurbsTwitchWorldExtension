@@ -100,16 +100,7 @@ if (fs.existsSync(serverPathRoot + '.crt') && fs.existsSync(serverPathRoot + '.k
   };
 }
 const server = new Hapi.Server(serverOptions);
-(async () => {
-  const validate = async (request, username, password) => {
-    const isValid = true;
-    const credentials = { id: 'test', name: 'test' };
-  
-    return { isValid, credentials };
-  };
-  
-  await server.register(require('@hapi/basic'));
-    server.auth.strategy('simple', 'basic', { validate });
+(async () => {  
   server.route({
     method: 'GET',
     path: '/test',
@@ -148,8 +139,7 @@ const server = new Hapi.Server(serverOptions);
               //'*'
             ],
             additionalHeaders: ['cache-control', 'x-requested-with']
-        },
-        auth: { strategies: ['simple'], mode: 'optional' }
+        }
     },
     method: 'POST',
     path: '/vote',
@@ -160,7 +150,7 @@ await server.register({
   plugin: require('hapi-rate-limit'),
   options: {
     enabled: true,
-    userLimit: 5,
+    userLimit: 5000,
     userCache: {
       segment: 'hapi-rate-limit-user',
       expiresIn: 5000
