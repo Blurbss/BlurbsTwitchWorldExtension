@@ -149,7 +149,7 @@ const server = new Hapi.Server(serverOptions);
             ],
             additionalHeaders: ['cache-control', 'x-requested-with']
         },
-        auth: { strategies: ['simple'] }
+        auth: { strategies: ['simple'], mode: 'optional' }
     },
     method: 'POST',
     path: '/vote',
