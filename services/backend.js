@@ -154,7 +154,8 @@ await server.register({
     userCache: {
       segment: 'hapi-rate-limit-user',
       expiresIn: 5000
-    }
+    },
+    userAttribute: 'opaque_user_id'
   }
 });
   await server.start();
@@ -259,7 +260,6 @@ function verifyAndDecode (header) {
 }
 
 function setVoteHandler (req) {
-  console.log(req.body);
   if (locked)
     return "Voting locked for end of this round";
   verifyAndDecode(req.headers.authorization); //AUTH
