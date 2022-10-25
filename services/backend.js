@@ -143,6 +143,11 @@ const server = new Hapi.Server(serverOptions);
     },
     method: 'POST',
     path: '/vote',
+    plugins: {
+      'hapi-rate-limit': {
+        userAttribute: 'opaque_user_id'
+      }
+    },
     handler: setVoteHandler
   });
   // Start the server.
@@ -260,6 +265,7 @@ function verifyAndDecode (header) {
 }
 
 function setVoteHandler (req) {
+  console.log(req.auth.credentials)
   if (locked)
     return "Voting locked for end of this round";
   verifyAndDecode(req.headers.authorization); //AUTH
