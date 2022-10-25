@@ -165,24 +165,25 @@ export default class App extends React.Component{
     }
 
     onGridClick = (cell) => {
-        this.setState({cooldown: true});
-        setTimeout(() => {this.setState({cooldown: false});}, 500);
+        //this.setState({cooldown: true});
+        //setTimeout(() => {this.setState({cooldown: false});}, 500);
         this.setAuth();
         console.log("CELL CLICKED: " + cell);
         //let roundRequest = this.requests.round;
         let voteRequest = this.requests.vote;
 
         console.log("CURRENTROUND: " + this.state.currentRound.toString() + " LASTROUND: " + this.state.lastRound);
-        if (this.state.currentRound != this.state.lastRound) {
+        //if (this.state.currentRound != this.state.lastRound) {
           voteRequest.data = {
             "vote":`${cell}`,
             "round": this.state.currentRound
           };
           this.setState({lastRound: this.state.currentRound});
           $.ajax(voteRequest);
-        }
-        else
-          console.log("VOTE FAILED");
+        //}
+        //else
+        //  console.log("VOTE FAILED");
+        
         
         /*$.ajax(roundRequest).then(x => {
           currentRound = x;

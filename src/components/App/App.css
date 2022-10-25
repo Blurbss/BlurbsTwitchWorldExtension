@@ -43,7 +43,6 @@
     font-size: 5vw;
     display: grid;
     grid-template-columns: repeat(3, 1fr) 1.5fr repeat(2, 1fr);
-    opacity: 0.5;
 }
 
 .full-size {
